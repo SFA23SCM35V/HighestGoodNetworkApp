@@ -259,9 +259,9 @@ const ViewTab = props => {
 
   const handleStartDates = async startDate => {
 
-    if(!userProfile.isFirstTimelog) {
-      alert('This user has already logged time in the system. Are you sure you want to change the start date?');
-    }
+    // if(!userProfile.isFirstTimelog) {
+    //   alert('This user has already logged time in the system. Are you sure you want to change the start date?');
+    // }
     props.onStartDate(startDate);
   };
 
