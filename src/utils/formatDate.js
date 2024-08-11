@@ -45,3 +45,4 @@ const DAY_OF_WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Fr
  */
 export const getDayOfWeekStringFromUTC = (utcTs) => moment(utcTs).tz('America/Los_Angeles').day();
 
+export const isBefore = (date1, date2) => moment(date1).isBefore(date2);

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Row, Label, Input, Col, Button, FormGroup } from 'reactstrap';
+import { Row, Label, Input, Col, Button, FormGroup, FormFeedback } from 'reactstrap';
 import moment from 'moment-timezone';
 import { capitalize } from 'lodash';
 import { ENDPOINTS } from 'utils/URL';
@@ -7,7 +7,7 @@ import axios from 'axios';
 import HistoryModal from './HistoryModal';
 import './timeTab.css';
 import { boxStyle, boxStyleDark } from 'styles';
-import { formatDate, formatDateYYYYMMDD, formatDateMMDDYYYY  } from 'utils/formatDate';
+import { formatDate, formatDateYYYYMMDD, formatDateMMDDYYYY, isBefore  } from 'utils/formatDate';
 
 
 const MINIMUM_WEEK_HOURS = 0;
@@ -29,21 +29,29 @@ const StartDate = props => {
   
   
   return (
-    <Input
-      type="date"
-      name="StartDate"
-      id="startDate"
-      className={startEndDateValidation(props) ? 'border-error-validation' : null}
-      value={props.userProfile.startDate}
-      min={formatDateYYYYMMDD(props.userProfile.createdDate)}
-      onChange={e => {
-        props.setUserProfile({ ...props.userProfile, startDate: e.target.value });
-        props.onStartDateComponent(e.target.value);
-      }}
-      placeholder="Start Date"
-      invalid={!props.canEdit}
-      max={props.userProfile.endDate ? formatDateYYYYMMDD(props.userProfile.endDate) : ''}
-    />
+    <>
+      <Input
+        type="date"
+        name="StartDate"
+        id="startDate"
+        className={startEndDateValidation(props) ? 'border-error-validation' : null}
+        value={props.userProfile.startDate}
+        min={isBefore('2022-02-01', props.userProfile.createdDate) ?
+          formatDateYYYYMMDD(props.userProfile.createdDate)
+          : ''
+        }
+        onChange={e => {
+          props.setUserProfile({ ...props.userProfile, startDate: e.target.value });
+          props.onStartDateComponent(e.target.value);
+        }}
+        placeholder="Start Date"
+        invalid={!props.canEdit}
+        max={props.userProfile.endDate ? formatDateYYYYMMDD(props.userProfile.endDate) : ''}
+      />
+      <FormFeedback tooltip>
+        Oh noes! that name is already taken
+      </FormFeedback>
+    </>
   );
 };
 
