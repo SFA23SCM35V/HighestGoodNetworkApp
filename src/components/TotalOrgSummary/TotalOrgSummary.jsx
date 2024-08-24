@@ -22,6 +22,7 @@ import AccordianWrapper from './AccordianWrapper/AccordianWrapper';
 import HoursWorkList from './HoursWorkList/HoursWorkList';
 import NumbersVolunteerWorked from './NumbersVolunteerWorked/NumbersVolunteerWorked';
 import Loading from '../common/Loading';
+import WorkDistributionBarChart from './components/WorkDistributionBarChart';
 
 function calculateFromDate() {
   const currentDate = new Date();
@@ -97,7 +98,7 @@ const aggregateTimeEntries = userTimeEntries => {
 };
 
 function TotalOrgSummary(props) {
-  const { darkMode, loading, error, allUserProfiles } = props;
+  const { darkMode, loading, error, allUserProfiles, totalOrgSummary, volunteerstats } = props;
 
   const [usersId, setUsersId] = useState([]);
   const [usersTimeEntries, setUsersTimeEntries] = useState([]);
@@ -155,6 +156,10 @@ function TotalOrgSummary(props) {
         });
     }
   }, [allUsersTimeEntries, usersId, fromOverDate, toOverDate]);
+
+  useEffect(() => {
+    props.getTotalOrgSummary(fromDate, toDate);
+  }, [fromDate, toDate, getTotalOrgSummary]);
 
   if (error) {
     return (
@@ -291,7 +296,10 @@ function TotalOrgSummary(props) {
         <Row>
           <Col lg={{ size: 7 }}>
             <div className="component-container component-border">
-              <VolunteerHoursDistribution />
+              {/* <VolunteerHoursDistribution /> */}
+              <WorkDistributionBarChart
+                workDistributionStats={totalOrgSummary.volunteerstats.workDistributionStats}
+              />
             </div>
           </Col>
           <Col lg={{ size: 5 }}>
@@ -327,6 +335,7 @@ const mapStateToProps = state => ({
   auth: state.auth,
   darkMode: state.theme.darkMode,
   allUserProfiles: state.allUserProfiles,
+  volunteerstats: state.totalOrgSummary.volunteerstats,
 });
 
 const mapDispatchToProps = dispatch => ({
