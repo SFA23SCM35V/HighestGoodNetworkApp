@@ -9,7 +9,7 @@ function CustomizedLabel(props){
 
   return (
     <g>
-      <text x={x + 10} y={y - 10} textAnchor="middle">
+      <text x={x + 20} y={y - 10} textAnchor="middle">
         <tspan x={x + 10} dy="0">{value}</tspan>
         <tspan x={x + 10} dy="20">{`${percentage}%`}</tspan>
       </text>
