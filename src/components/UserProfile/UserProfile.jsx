@@ -65,6 +65,7 @@ import {
   DEV_ADMIN_ACCOUNT_CUSTOM_WARNING_MESSAGE_DEV_ENV_ONLY,
   PROTECTED_ACCOUNT_MODIFICATION_WARNING_MESSAGE,
 } from 'utils/constants';
+import { formatDate, formatDateYYYYMMDD, formatDateMMDDYYYY, isBefore  } from 'utils/formatDate';
 
 function UserProfile(props) {
   const darkMode = useSelector(state => state.theme.darkMode);
@@ -123,6 +124,7 @@ function UserProfile(props) {
 
   const [userStartDate, setUserStartDate] = useState('');
   const [userEndDate, setUserEndDate] = useState('');
+  const [userCreatedDate, setUserCreatedDate] = useState('');
 
   const [inputAutoComplete, setInputAutoComplete] = useState([]);
   const [inputAutoStatus, setInputAutoStatus] = useState();
@@ -347,6 +349,8 @@ function UserProfile(props) {
         startDate: newUserProfile?.startDate.split('T')[0],
       });
       setUserStartDate(newUserProfile?.startDate.split('T')[0]);
+      setUserCreatedDate(newUserProfile?.createdDate.split('T')[0]);
+      // console.log("loadUserProfile newUserProfile:", newUserProfile);
       checkIsProjectsEqual();
       // isTeamSaved(true);
       setShowLoading(false);
@@ -789,6 +793,12 @@ function UserProfile(props) {
   const handleEndDate = async endDate => {
     setUserEndDate(endDate);
   };
+
+  const isStartDateValid = (createDate, startDate) => {
+    console.log("createdDate and startDate:", createDate, startDate);
+    return isBefore(createDate, '2022-01-01') || isBefore(createDate, startDate);
+  }
+
   return (
     <div className={darkMode ? 'bg-oxford-blue' : ''} style={{ minHeight: '100%' }}>
       <ActiveInactiveConfirmationPopup
@@ -1258,6 +1268,7 @@ function UserProfile(props) {
               {canEdit && activeTab && (
                 <>
                   <SaveButton
+                    text="Save Changes 1"
                     className="mr-1 btn-bottom"
                     handleSubmit={async () => await handleSubmit()}
                     disabled={
@@ -1266,9 +1277,11 @@ function UserProfile(props) {
                       !formValid.email ||
                       !codeValid ||
                       (userStartDate > userEndDate && userEndDate !== '') ||
+                      !isStartDateValid(userCreatedDate, userStartDate) ||
                       (isProfileEqual && isTasksEqual && isTeamsEqual && isProjectsEqual) ||
                       isTeamSaved
                     }
+
                     userProfile={userProfile}
                     setSaved={() => setSaved(true)}
                     darkMode={darkMode}
@@ -1389,6 +1402,7 @@ function UserProfile(props) {
                       {canEdit && (activeTab == '1' || canPutUserProfile) && (
                         <>
                           <SaveButton
+                            text="Save Changes 2"
                             className="mr-1 btn-bottom"
                             handleSubmit={async () => await handleSubmit()}
                             disabled={
@@ -1464,6 +1478,7 @@ function UserProfile(props) {
                       {canEdit && (activeTab == '1' || canPutUserProfile) && (
                         <>
                           <SaveButton
+                            text="Save Changes 3"
                             className="mr-1 btn-bottom"
                             handleSubmit={async () => await handleSubmit()}
                             disabled={
@@ -1471,6 +1486,7 @@ function UserProfile(props) {
                               !formValid.lastName ||
                               !formValid.email ||
                               !codeValid ||
+                              !isStartDateValid(userCreatedDate, userStartDate) ||
                               (isProfileEqual && isTasksEqual && isTeamsEqual && isProjectsEqual)
                             }
                             userProfile={userProfile}
@@ -1560,6 +1576,7 @@ function UserProfile(props) {
                       {canEdit && (activeTab == '1' || canPutUserProfile) && (
                         <>
                           <SaveButton
+                            text="Save Changes 4"
                             className="mr-1 btn-bottom"
                             handleSubmit={async () => await handleSubmit()}
                             disabled={
@@ -1643,6 +1660,7 @@ function UserProfile(props) {
                       {canEdit && (activeTab == '1' || canPutUserProfile) && (
                         <>
                           <SaveButton
+                            text="Save Changes 5"
                             className="mr-1 btn-bottom"
                             handleSubmit={async () => await handleSubmit()}
                             disabled={
@@ -1713,6 +1731,7 @@ function UserProfile(props) {
                       {canEdit && (activeTab == '1' || canPutUserProfile) && (
                         <>
                           <SaveButton
+                            text="Save Changes 6"
                             className="mr-1 btn-bottom"
                             handleSubmit={async () => await handleSubmit()}
                             disabled={

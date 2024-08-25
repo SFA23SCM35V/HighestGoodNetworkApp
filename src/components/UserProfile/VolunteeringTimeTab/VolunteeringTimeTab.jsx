@@ -36,7 +36,7 @@ const StartDate = props => {
         id="startDate"
         className={startEndDateValidation(props) ? 'border-error-validation' : null}
         value={props.userProfile.startDate}
-        min={isBefore('2022-02-01', props.userProfile.createdDate) ?
+        min={isBefore('2022-01-01', props.userProfile.createdDate) ?
           formatDateYYYYMMDD(props.userProfile.createdDate)
           : ''
         }
