@@ -45,4 +45,5 @@ const DAY_OF_WEEK = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Fr
  */
 export const getDayOfWeekStringFromUTC = (utcTs) => moment(utcTs).tz('America/Los_Angeles').day();
 
-export const isBefore = (date1, date2) => moment(date1).isBefore(date2);
+export const isBefore = (date1, date2) => moment(date1).tz(LA_TIME_ZONE).isBefore(moment(date2).tz(LA_TIME_ZONE));
+export const dateOneDayBefore = (date) => moment(date).subtract(1, 'days').tz(LA_TIME_ZONE).format('YYYYMMDD');

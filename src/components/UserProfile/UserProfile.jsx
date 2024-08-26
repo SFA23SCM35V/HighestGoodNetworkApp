@@ -340,16 +340,20 @@ function UserProfile(props) {
         ...newUserProfile,
         jobTitle: newUserProfile.jobTitle[0],
         phoneNumber: newUserProfile.phoneNumber[0],
-        startDate: newUserProfile?.startDate.split('T')[0],
+        // startDate: newUserProfile?.startDate.split('T')[0],
+        startDate: formatDateYYYYMMDD(newUserProfile?.startDate),
       });
       setOriginalUserProfile({
         ...newUserProfile,
         jobTitle: newUserProfile.jobTitle[0],
         phoneNumber: newUserProfile.phoneNumber[0],
-        startDate: newUserProfile?.startDate.split('T')[0],
+        // startDate: newUserProfile?.startDate.split('T')[0],
+        startDate: formatDateYYYYMMDD(newUserProfile?.startDate),
       });
-      setUserStartDate(newUserProfile?.startDate.split('T')[0]);
-      setUserCreatedDate(newUserProfile?.createdDate.split('T')[0]);
+      // setUserStartDate(newUserProfile?.startDate.split('T')[0]);
+      setUserStartDate(formatDateYYYYMMDD(newUserProfile?.startDate));
+      // setUserCreatedDate(newUserProfile?.createdDate.split('T')[0]);
+      setUserCreatedDate(formatDateYYYYMMDD(newUserProfile?.createdDate));
       // console.log("loadUserProfile newUserProfile:", newUserProfile);
       checkIsProjectsEqual();
       // isTeamSaved(true);
@@ -795,8 +799,9 @@ function UserProfile(props) {
   };
 
   const isStartDateValid = (createDate, startDate) => {
-    console.log("createdDate and startDate:", createDate, startDate);
-    return isBefore(createDate, '2022-01-01') || isBefore(createDate, startDate);
+    // console.log("createdDate and startDate:", createDate, startDate);
+    // return isBefore(createDate, '2022-01-01') || isBefore(createDate, startDate);
+    return createDate < '2022-01-01' || createDate <= startDate;
   }
 
   return (
@@ -1281,7 +1286,6 @@ function UserProfile(props) {
                       (isProfileEqual && isTasksEqual && isTeamsEqual && isProjectsEqual) ||
                       isTeamSaved
                     }
-
                     userProfile={userProfile}
                     setSaved={() => setSaved(true)}
                     darkMode={darkMode}

@@ -7,7 +7,7 @@ import axios from 'axios';
 import HistoryModal from './HistoryModal';
 import './timeTab.css';
 import { boxStyle, boxStyleDark } from 'styles';
-import { formatDate, formatDateYYYYMMDD, formatDateMMDDYYYY, isBefore  } from 'utils/formatDate';
+import { formatDate, formatDateYYYYMMDD, formatDateMMDDYYYY, isBefore, dateOneDayBefore  } from 'utils/formatDate';
 
 
 const MINIMUM_WEEK_HOURS = 0;
@@ -21,37 +21,44 @@ const startEndDateValidation = props => {
 
 
 const StartDate = props => {
-  const {darkMode} = props;
+  const {darkMode, userProfile} = props;
+  const minDate = '2022-01-01';
+  const [startDateValidationMessage, setStartDateValidationMessage] = useState("");
+  const errorMessage = "Error: the start date is before the account created date";
 
   if (!props.canEdit) {
     return <p className={darkMode ? 'text-azure' : ''}>{formatDateYYYYMMDD(props.userProfile.startDate)}</p>;
   }
-  
-  
+
   return (
-    <>
+    <FormGroup>
       <Input
         type="date"
         name="StartDate"
         id="startDate"
         className={startEndDateValidation(props) ? 'border-error-validation' : null}
         value={props.userProfile.startDate}
-        min={isBefore('2022-01-01', props.userProfile.createdDate) ?
+        min={minDate <= formatDateYYYYMMDD(props.userProfile.createdDate) ?
           formatDateYYYYMMDD(props.userProfile.createdDate)
           : ''
         }
         onChange={e => {
           props.setUserProfile({ ...props.userProfile, startDate: e.target.value });
           props.onStartDateComponent(e.target.value);
+          if (minDate <= formatDateYYYYMMDD(props.userProfile.createdDate) && e.target.value < formatDateYYYYMMDD(props.userProfile.createdDate)){
+            setStartDateValidationMessage(errorMessage);
+          } else{
+            setStartDateValidationMessage('');
+          }
         }}
         placeholder="Start Date"
         invalid={!props.canEdit}
         max={props.userProfile.endDate ? formatDateYYYYMMDD(props.userProfile.endDate) : ''}
       />
-      <FormFeedback tooltip>
-        Oh noes! that name is already taken
-      </FormFeedback>
-    </>
+      {startDateValidationMessage && <FormFeedback style={{ display: 'block' }}>
+        {startDateValidationMessage}
+      </FormFeedback>}
+    </FormGroup>
   );
 };
 
@@ -76,6 +83,7 @@ const EndDate = props => {
       id="endDate"
       value={
         props.userProfile.endDate ? props.userProfile.endDate.toLocaleString().split('T')[0] : ''
+        // props.userProfile.endDate ? formatDateYYYYMMDD(props.userProfile.endDate) : ''
       }
       onChange={e => {
         props.setUserProfile({ ...props.userProfile, endDate: e.target.value });
