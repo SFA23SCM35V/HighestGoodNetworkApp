@@ -5,7 +5,6 @@ import 'react-table/react-table.css';
 import Collapse from 'react-bootstrap/Collapse';
 import './TasksDetail.css';
 
-
 const ShowCollapse = (props) => {
   const [open, setOpen] = useState(false);
 
@@ -15,7 +14,6 @@ const ShowCollapse = (props) => {
         {props.resources[0].name}
         {props.resources.length > 1 && ','}
       </div>
-      {}
       {open && (
         <>
           {props.resources.slice(1).map((resource, index) => (
@@ -28,7 +26,6 @@ const ShowCollapse = (props) => {
           ))}
         </>
       )}
-      {}
       <Button onClick={() => setOpen(!open)} aria-expanded={open} size="sm">
         {open ? 'Show less' : `Show more (${props.resources.length})`} ➤
       </Button>
@@ -37,11 +34,11 @@ const ShowCollapse = (props) => {
 };
 
 const formatDate = (datetime) => {
-  if(datetime){
+  if (datetime) {
     const options = { year: 'numeric', month: 'short', day: 'numeric' };
     return new Date(datetime).toLocaleDateString(undefined, options);
   }
-  return 'N/A'
+  return 'N/A';
 };
 
 const truncate = (str, n) => {
@@ -73,7 +70,6 @@ export const TasksDetail = (props) => {
     setFilteredTasks(tasks);
   }, [props.tasks_filter, props.priority, props.status, props.classification, props.isActive, props.isAssigned, props.users]);
 
-
   const tasksList = filteredTasks.map((task, index) => (
     <tr key={task._id} className={darkMode ? 'dark-mode-row' : ''}>
       <td>{index + 1}</td>
@@ -82,24 +78,18 @@ export const TasksDetail = (props) => {
       <td>{task.status}</td>
       <td className="tasks-detail-center-cells">
         {task.resources.length <= 2 ? (
-          task.resources.map((resource) => <div key={resource._id}>{resource.name}</div>)
+          <span>
+            {task.resources.map((resource, index) => (
+              <span key={resource._id}>
+                {resource.name}
+                {index < task.resources.length - 1 && ', '}
+              </span>
+            ))}
+          </span>
         ) : (
           <ShowCollapse resources={task.resources} />
         )}
       </td>
-      <td className="tasks-detail-center-cells">
-  {task.resources.length <= 2 ? (
-    task.resources.map((resource, index) => (
-      <span key={resource._id}>
-        {resource.name}
-        {index < task.resources.length - 1 && ', '}
-      </span>
-    ))
-  ) : (
-    <ShowCollapse resources={task.resources} />
-  )}
-</td>
-
       <td className="tasks-detail-center-cells collapse-column">
         {task.isAssigned ? <div>Assign</div> : <div>Not Assign</div>}
       </td>
