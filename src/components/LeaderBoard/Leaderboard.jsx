@@ -364,7 +364,7 @@ function LeaderBoard({
           className="d-flex justify-content-center align-items-center"
           style={{ height: '200px' }}
         >
-          <Spinner color="primary" style={{ width: '3rem', height: '3rem' }} />
+          <Spinner color="primary" className="spinner-border spinner-border-lg" />
         </div>
       ) : (
         <div id="leaderboard" className="my-custom-scrollbar table-wrapper-scroll-y">
