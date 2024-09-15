@@ -1,6 +1,6 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useState, useRef, useCallback } from 'react';
 import './Leaderboard.css';
-import { isEqual } from 'lodash';
+import { isEqual, debounce } from 'lodash';
 import { Link } from 'react-router-dom';
 import {
   Table,
@@ -103,9 +103,8 @@ function LeaderBoard({
   const [teamsUsers, setTeamsUsers] = useState(leaderBoardData);
   const [innerWidth, setInnerWidth] = useState();
   const [isLoading, setIsLoading] = useState(false);
-  const individualsWithZeroHours = leaderBoardData.filter(
-    individuals => individuals.weeklycommittedHours === 0,
-  );
+  const [searchInput, setSearchInput] = useState('');
+  const [filteredUsers, setFilteredUsers] = useState(teamsUsers);
 
   useEffect(() => {
     const fetchInitial = async () => {
@@ -258,6 +257,27 @@ function LeaderBoard({
     setTextButton('My Team');
   };
 
+  useEffect(() => {
+    setFilteredUsers(teamsUsers);
+    return () => {
+      setSearchInput('');
+    };
+  }, [teamsUsers]);
+
+  const debouncedFilterUsers = useCallback(
+    debounce(query => {
+      setFilteredUsers(
+        teamsUsers.filter(user => user.name.toLowerCase().includes(query.toLowerCase())),
+      );
+    }, 1000),
+    [teamsUsers],
+  );
+
+  const handleSearch = e => {
+    setSearchInput(e.target.value);
+    debouncedFilterUsers(e.target.value);
+  };
+
   return (
     <div>
       <h3>
@@ -348,6 +368,15 @@ function LeaderBoard({
         </div>
       ) : (
         <div id="leaderboard" className="my-custom-scrollbar table-wrapper-scroll-y">
+          <div className="search-container mx-1">
+            <input
+              className="form-control col-12 mb-2"
+              type="text"
+              placeholder="Search users..."
+              value={searchInput}
+              onChange={handleSearch}
+            />
+          </div>
           <Table
             className={`leaderboard table-fixed ${
               darkMode ? 'text-light dark-mode bg-yinmn-blue' : ''
@@ -400,28 +429,40 @@ function LeaderBoard({
                   <span>{organizationData.name}</span>
                   {viewZeroHouraMembers(loggedInUser.role) && (
                     <span className="leaderboard-totals-title">
-                      0 hrs Totals: {individualsWithZeroHours.length} Members
+                      0 hrs Totals:{' '}
+                      {filteredUsers.filter(user => user.weeklycommittedHours === 0).length} Members
                     </span>
                   )}
                 </th>
                 <td className="align-middle" aria-label="Description" />
                 <td className="align-middle">
-                  <span title="Tangible time">{organizationData.tangibletime || ''}</span>
+                  <span title="Tangible time">
+                    {filteredUsers.reduce((total, user) => total + user.tangibletime, 0).toFixed(2)}
+                  </span>
                 </td>
                 <td className="align-middle" aria-label="Description">
                   <Progress
-                    title={`TangibleEffort: ${organizationData.tangibletime} hours`}
-                    value={organizationData.barprogress}
-                    color={organizationData.barcolor}
+                    title={`TangibleEffort: ${filteredUsers
+                      .reduce((total, user) => total + user.tangibletime, 0)
+                      .toFixed(2)} hours`}
+                    value={
+                      (filteredUsers.reduce((total, user) => total + user.tangibletime, 0) /
+                        filteredUsers.reduce((total, user) => total + user.weeklycommittedHours, 0)) *
+                      100
+                    }
+                    color="primary"
                   />
                 </td>
                 <td className="align-middle">
                   <span title="Tangible + Intangible time = Total time">
-                    {organizationData.totaltime} of {organizationData.weeklycommittedHours}
+                    {filteredUsers
+                      .reduce((total, user) => total + parseFloat(user.totaltime), 0)
+                      .toFixed(2)}{' '}
+                    of {filteredUsers.reduce((total, user) => total + user.weeklycommittedHours, 0)}
                   </span>
                 </td>
               </tr>
-              {teamsUsers.map(item => (
+              {filteredUsers.map(item => (
                 <tr key={item.personId}>
                   <td className="align-middle">
                     <div>
@@ -616,9 +657,7 @@ function LeaderBoard({
                     <span
                       title={mouseoverTextValue}
                       id="Total time"
-                      className={
-                        item.totalintangibletime_hrs > 0 ? 'leaderboard-totals-title' : null
-                      }
+                      className={item.totalintangibletime_hrs > 0 ? 'leaderboard-totals-title' : null}
                     >
                       {item.totaltime}
                     </span>
