@@ -447,7 +447,10 @@ function LeaderBoard({
                       .toFixed(2)} hours`}
                     value={
                       (filteredUsers.reduce((total, user) => total + user.tangibletime, 0) /
-                        filteredUsers.reduce((total, user) => total + user.weeklycommittedHours, 0)) *
+                        filteredUsers.reduce(
+                          (total, user) => total + user.weeklycommittedHours,
+                          0,
+                        )) *
                       100
                     }
                     color="primary"
@@ -657,7 +660,9 @@ function LeaderBoard({
                     <span
                       title={mouseoverTextValue}
                       id="Total time"
-                      className={item.totalintangibletime_hrs > 0 ? 'leaderboard-totals-title' : null}
+                      className={
+                        item.totalintangibletime_hrs > 0 ? 'leaderboard-totals-title' : null
+                      }
                     >
                       {item.totaltime}
                     </span>
