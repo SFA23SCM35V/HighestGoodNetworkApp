@@ -24,8 +24,6 @@ const UserTeamsTable = props => {
 
   const [innerWidth, setInnerWidth] = useState();
 
-  const [arrayInputAutoComplete, setArrayInputAutoComplete] = useState(props.inputAutoComplete);
-
   const [teamCode, setTeamCode] = useState(
     props.userProfile ? props.userProfile.teamCode : props.teamCode,
   );
@@ -43,17 +41,22 @@ const UserTeamsTable = props => {
 
   const refInput = useRef(null);
 
+  const arrayInputAutoComplete = useRef(props.inputAutoComplete);
+
+  const [triggerRender, setTriggerRender] = useState(false);
+
   const canAssignTeamToUsers = props.hasPermission('assignTeamToUsers');
   const fullCodeRegex = /^(|([a-zA-Z0-9]-[a-zA-Z0-9]{3,5}|[a-zA-Z0-9]{5,7}|.-[a-zA-Z0-9]{3}))$/;
   const toggleTooltip = () => setTooltip(!tooltipOpen);
-  
-   useEffect(() => {
+
+  useEffect(() => {
     if (props.userProfile?.teamCode) {
       setTeamCode(props.userProfile.teamCode);
     }
   }, [props.userProfile.teamCode]);
 
   const handleCodeChange = async (e, autoComplete) => {
+    autoComplete ? setShowDropdown(false) : null;
     const validation = autoComplete ? e : e.target.value;
     const isUpdateAutoComplete = validationUpdateAutoComplete(validation, props.inputAutoComplete);
     const regexTest = fullCodeRegex.test(validation);
@@ -65,15 +68,12 @@ const UserTeamsTable = props => {
         try {
           const url = ENDPOINTS.USER_PROFILE_PROPERTY(props.userProfile._id);
           await axios.patch(url, { key: 'teamCode', value: refInput.current });
-          toast.success('Team code updated!');
-          setTimeout(async () => {
-            //prettier-ignore
-            if(isUpdateAutoComplete.length === 0){
-             const newAutoComplete = await props.fetchTeamCodeAllUsers();
-              toast.info('Auto complete updated!')
-              validationUpdateAutoComplete(refInput.current, newAutoComplete);
-            }
-          }, 2000);
+          refInput.current.length > 0 && toast.success('Team code updated!');
+          if (isUpdateAutoComplete && isUpdateAutoComplete.length === 0) {
+            arrayInputAutoComplete.current = [...arrayInputAutoComplete.current, refInput.current];
+            setTriggerRender(prev => !prev);
+            toast.info('Auto complete updated!');
+          }
         } catch {
           toast.error('It is not possible to save the team code.');
         }
@@ -84,22 +84,20 @@ const UserTeamsTable = props => {
       setTeamCode(validation);
       props.setCodeValid(false);
     }
-    autoComplete ? setShowDropdown(false) : null;
     autoComplete = false;
   };
-
   const validationUpdateAutoComplete = (e, autoComplete) => {
     if (e !== '' && !props.isLoading) {
       const isMatchingSearch = autoComplete.filter(item =>
         filterInputAutoComplete(item).includes(filterInputAutoComplete(e)),
       );
-      setArrayInputAutoComplete(isMatchingSearch);
+      arrayInputAutoComplete.current = isMatchingSearch;
       //prettier-ignore
       return isMatchingSearch.filter(item => filterInputAutoComplete(item) === filterInputAutoComplete(e));
-    } else setArrayInputAutoComplete(props.inputAutoComplete);
+    } else arrayInputAutoComplete.current = props.inputAutoComplete;
   };
   //prettier-ignore
-  useEffect(() => {setArrayInputAutoComplete(props.inputAutoComplete)}, [props.inputAutoStatus]);
+  useEffect(() => {arrayInputAutoComplete.current = props.inputAutoComplete}, [props.inputAutoStatus]);
 
   const filterInputAutoComplete = result => {
     return result
@@ -230,7 +228,7 @@ const UserTeamsTable = props => {
                     showDropdown={showDropdown}
                     handleCodeChange={handleCodeChange}
                     setShowDropdown={setShowDropdown}
-                    arrayInputAutoComplete={arrayInputAutoComplete}
+                    arrayInputAutoComplete={arrayInputAutoComplete.current}
                     inputAutoStatus={props.inputAutoStatus}
                     isLoading={props.isLoading}
                     fetchTeamCodeAllUsers={props.fetchTeamCodeAllUsers}
@@ -370,7 +368,7 @@ const UserTeamsTable = props => {
                     showDropdown={showDropdown}
                     handleCodeChange={handleCodeChange}
                     setShowDropdown={setShowDropdown}
-                    arrayInputAutoComplete={arrayInputAutoComplete}
+                    arrayInputAutoComplete={arrayInputAutoComplete.current}
                     inputAutoStatus={props.inputAutoStatus}
                     isLoading={props.isLoading}
                     fetchTeamCodeAllUsers={props.fetchTeamCodeAllUsers}
@@ -386,10 +384,7 @@ const UserTeamsTable = props => {
               </Col>
             </div>
             {props.edit && props.role && (
-              <Col 
-                md="12"
-                style={{ padding: '0' }}
-              >
+              <Col md="12" style={{ padding: '0' }}>
                 {canAssignTeamToUsers ? (
                   props.disabled ? (
                     <Button className="btn-addteam" color="primary" style={boxStyle} disabled>
