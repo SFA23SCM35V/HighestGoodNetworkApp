@@ -43,8 +43,7 @@ const UserTeamsTable = props => {
 
   const arrayInputAutoComplete = useRef(props.inputAutoComplete);
 
-  const [triggerRender, setTriggerRender] = useState(false);
-
+  const [autoCompleteUpdateMessage, setAutoCompleteUpdateMessage] = useState(false);
   const canAssignTeamToUsers = props.hasPermission('assignTeamToUsers');
   const fullCodeRegex = /^(|([a-zA-Z0-9]-[a-zA-Z0-9]{3,5}|[a-zA-Z0-9]{5,7}|.-[a-zA-Z0-9]{3}))$/;
   const toggleTooltip = () => setTooltip(!tooltipOpen);
@@ -59,6 +58,12 @@ const UserTeamsTable = props => {
     autoComplete ? setShowDropdown(false) : null;
     const validation = autoComplete ? e : e.target.value;
     const isUpdateAutoComplete = validationUpdateAutoComplete(validation, props.inputAutoComplete);
+
+    // prettier-ignore
+    (validation.length > 0 && (validation.length > 4 || validation.length < 8)) &&
+      isUpdateAutoComplete.length === 0 &&
+      setAutoCompleteUpdateMessage(true);
+
     const regexTest = fullCodeRegex.test(validation);
     refInput.current = validation;
     if (regexTest) {
@@ -68,11 +73,13 @@ const UserTeamsTable = props => {
         try {
           const url = ENDPOINTS.USER_PROFILE_PROPERTY(props.userProfile._id);
           await axios.patch(url, { key: 'teamCode', value: refInput.current });
-          refInput.current.length > 0 && toast.success('Team code updated!');
+          refInput.current.length > 0 &&
+            toast.success('The code is valid, and the team code was updated!');
           if (isUpdateAutoComplete && isUpdateAutoComplete.length === 0) {
-            arrayInputAutoComplete.current = [...arrayInputAutoComplete.current, refInput.current];
-            setTriggerRender(prev => !prev);
-            toast.info('Auto complete updated!');
+            props.fetchTeamCodeAllUsers();
+            toast.info('The suggestions in auto-complete were updated!');
+            // prettier-ignore
+            setAutoCompleteUpdateMessage(false);
           }
         } catch {
           toast.error('It is not possible to save the team code.');
@@ -83,6 +90,7 @@ const UserTeamsTable = props => {
     } else {
       setTeamCode(validation);
       props.setCodeValid(false);
+      setAutoCompleteUpdateMessage(false);
     }
     autoComplete = false;
   };
@@ -213,7 +221,8 @@ const UserTeamsTable = props => {
                         target="teamCodeAssign"
                         toggle={toggleTeamCodeExplainTooltip}
                       >
-                        This team code should only be used by Admins/Owners, and has nothing to do with the team data model.
+                        This team code should only be used by Admins/Owners, and has nothing to do
+                        with the team data model.
                       </Tooltip>
                     </>
                   )}
@@ -234,6 +243,7 @@ const UserTeamsTable = props => {
                     darkMode={darkMode}
                     isMobile={false}
                     refInput={refInput}
+                    autoCompleteUpdateMessage={autoCompleteUpdateMessage}
                   />
                 ) : (
                   <div id="teamCodeAssignText" style={{ fontSize: '12px', textAlign: 'center' }}>
@@ -374,6 +384,7 @@ const UserTeamsTable = props => {
                     darkMode={darkMode}
                     isMobile={true}
                     refInput={refInput}
+                    autoCompleteUpdateMessage={autoCompleteUpdateMessage}
                   />
                 ) : (
                   <div style={{ paddingTop: '6px', textAlign: 'center' }}>
