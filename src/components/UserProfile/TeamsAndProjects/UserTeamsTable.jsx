@@ -76,8 +76,9 @@ const UserTeamsTable = props => {
           refInput.current.length > 0 &&
             toast.success('The code is valid, and the team code was updated!');
           if (isUpdateAutoComplete && isUpdateAutoComplete.length === 0) {
-            props.fetchTeamCodeAllUsers();
+            const newAutoComplete = await props.fetchTeamCodeAllUsers();
             toast.info('The suggestions in auto-complete were updated!');
+            validationUpdateAutoComplete(refInput.current, newAutoComplete);
             // prettier-ignore
             setAutoCompleteUpdateMessage(false);
           }
