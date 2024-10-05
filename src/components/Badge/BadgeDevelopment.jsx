@@ -86,11 +86,26 @@ function BadgeDevelopment(props) {
               placeholder="Enter name here"
               value={searchName}
               onChange={e => setSearchName(e.target.value)}
+              style={{
+                width: '225px',
+                padding: '5px',
+                borderRadius: '4px',
+                border: '1px solid #ccc',
+              }}
             />
           </div>
           <div style={{ marginBottom: '10px' }}>
             <p style={{ display: 'inline', marginRight: '8px' }}>Filter by type:</p>
-            <select value={searchType} onChange={e => setSearchType(e.target.value)}>
+            <select
+              value={searchType}
+              onChange={e => setSearchType(e.target.value)}
+              style={{
+                width: '250px',
+                padding: '5px',
+                borderRadius: '4px',
+                border: '1px solid #ccc',
+              }}
+            >
               <option value="">Select a type</option>
               {BadgeTypes.map((type, index) => (
                 <option key={index} value={type}>
@@ -118,7 +133,12 @@ function BadgeDevelopment(props) {
                 placeholder="Rank Number"
                 value={chooseRankFilter}
                 onChange={e => setChooseRankFilter(e.target.value)}
-                style={{ width: '80px', textAlign: 'center' }}
+                style={{
+                  width: '120px',
+                  padding: '5px',
+                  borderRadius: '4px',
+                  border: '1px solid #ccc',
+                }}
               />
             </div>
           </div>
